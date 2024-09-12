@@ -4,3 +4,4 @@ numpy
 joblib
 matplotlib
 tensorflow
+streamlit_drawable_canvas
