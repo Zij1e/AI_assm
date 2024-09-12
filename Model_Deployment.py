@@ -21,7 +21,7 @@ DATADIR = "emnist"
 #only 2nd column needed, has delimiters, no header
 
 mapp = pd.read_csv(
-    "emnist\\emnist-balanced-mapping.txt",
+    "emnist-balanced-mapping.txt",
     delimiter=' ',
     header=None,
     usecols=[1]
