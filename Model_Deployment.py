@@ -65,14 +65,9 @@ canvas_result = st_canvas(
 )
 
 # Buttons for actions
-col1, col2 = st.columns(2)
+col1 = st.columns(1)
 
 with col1:
-    if st.button("Clear Canvas"):
-        st.session_state['canvas_image_data'] = None
-        st.session_state['canvas_json_data'] = None
-
-with col2:
     if st.button("Predict"):
         if canvas_result.image_data is not None:
             image = Image.fromarray(canvas_result.image_data.astype('uint8'))
