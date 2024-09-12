@@ -1,8 +1,9 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
-from PIL import Image, ImageDraw
+from PIL import Image
 from tensorflow.keras.models import load_model
+from streamlit_drawable_canvas import st_canvas
 
 # Load the model
 @st.cache_resource
@@ -27,7 +28,7 @@ class_mapping = load_class_mapping()
 
 def predict_character(image):
     # Preprocess the image
-    image = image.resize((28, 28))
+    image = image.resize((28, 28)).convert('L')
     image = np.array(image)
     image = image.reshape(1, 28, 28, 1)
     image = image / 255.0
@@ -48,47 +49,44 @@ def predict_character(image):
 st.title("Handwriting Recognition with LSTM")
 
 # Create a canvas for drawing
-canvas_result = st.empty()
-canvas = st.empty()
-
-# Create a PIL Image for drawing
-image = Image.new("L", (280, 280), color="black")
-draw = ImageDraw.Draw(image)
-
-# Function to handle mouse events for drawing
-def on_mouse_move(event):
-    x, y = event.x, event.y
-    if event.buttons:
-        draw.line([x, y, x+1, y+1], fill="white", width=20)
-        canvas.image(image)
-
-# Create a canvas using Streamlit's custom component
-canvas_result = st.empty()
-canvas = st.empty()
+canvas_result = st_canvas(
+    fill_color="black",
+    stroke_width=20,
+    stroke_color="white",
+    background_color="black",
+    height=280,
+    width=280,
+    drawing_mode="freedraw",
+    key="canvas",
+)
 
 # Buttons for actions
 col1, col2, col3 = st.columns(3)
+
 with col1:
     if st.button("Clear Canvas"):
-        image = Image.new("L", (280, 280), color="black")
-        draw = ImageDraw.Draw(image)
-        canvas.image(image)
+        canvas_result.image_data.fill(0)
+        st.experimental_rerun()
 
 with col2:
     if st.button("Predict"):
-        predicted_char, confidence = predict_character(image)
-        st.write(f"The predicted character is: {predicted_char}")
-        st.write(f"Confidence: {confidence:.2f}%")
+        if canvas_result.image_data is not None:
+            image = Image.fromarray(canvas_result.image_data.astype('uint8'))
+            predicted_char, confidence = predict_character(image)
+            st.write(f"The predicted character is: {predicted_char}")
+            st.write(f"Confidence: {confidence:.2f}%")
+        else:
+            st.write("Please draw something before predicting.")
 
 with col3:
     # Option to upload an image
     uploaded_file = st.file_uploader("Choose an image...", type=["png", "jpg", "jpeg"])
     if uploaded_file is not None:
-        image = Image.open(uploaded_file).convert("L")
-        canvas.image(image)
-
-# Display the canvas
-canvas.image(image)
+        image = Image.open(uploaded_file).convert("RGB")
+        st.image(image, caption="Uploaded Image", use_column_width=True)
+        predicted_char, confidence = predict_character(image)
+        st.write(f"The predicted character is: {predicted_char}")
+        st.write(f"Confidence: {confidence:.2f}%")
 
 # Instructions for users
 st.markdown("""
