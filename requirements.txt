@@ -4,4 +4,3 @@ numpy
 joblib
 matplotlib
 tensorflow
-tkinter
