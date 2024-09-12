@@ -64,18 +64,15 @@ canvas_result = st_canvas(
     key=f"canvas_{st.session_state.canvas_key}",
 )
 
-# Buttons for actions
-col1 = st.columns(1)
 
-with col1:
-    if st.button("Predict"):
-        if canvas_result.image_data is not None:
-            image = Image.fromarray(canvas_result.image_data.astype('uint8'))
-            predicted_char, confidence = predict_character(image)
-            st.write(f"The predicted character is: {predicted_char}")
-            st.write(f"Confidence: {confidence:.2f}%")
-        else:
-            st.write("Please draw something before predicting.")
+if st.button("Predict"):
+    if canvas_result.image_data is not None:
+        image = Image.fromarray(canvas_result.image_data.astype('uint8'))
+        predicted_char, confidence = predict_character(image)
+        st.write(f"The predicted character is: {predicted_char}")
+        st.write(f"Confidence: {confidence:.2f}%")
+    else:
+        st.write("Please draw something before predicting.")
 
 # Instructions for users
 st.markdown("""
