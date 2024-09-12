@@ -88,5 +88,4 @@ st.markdown("""
     1. Draw a single character on the canvas above.
     2. Click 'Predict' to see the recognition result.
     3. Use 'Clear Canvas' to start over.
-    4. You can also upload an image using the 'Choose an image...' option.
 """)
