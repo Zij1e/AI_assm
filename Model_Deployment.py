@@ -15,7 +15,7 @@ model = load_keras_model()
 @st.cache_data
 def load_class_mapping():
     mapp = pd.read_csv(
-        "emnist\\emnist-balanced-mapping.txt",
+        "emnist-balanced-mapping.txt",
         delimiter=' ',
         header=None,
         usecols=[1]
