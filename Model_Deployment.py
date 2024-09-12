@@ -69,8 +69,8 @@ col1, col2 = st.columns(2)
 
 with col1:
     if st.button("Clear Canvas"):
-        st.session_state.canvas_key += 1
-        st.experimental_rerun()
+        st.session_state['canvas_image_data'] = None
+        st.session_state['canvas_json_data'] = None
 
 with col2:
     if st.button("Predict"):
