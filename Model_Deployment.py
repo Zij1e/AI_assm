@@ -5,6 +5,16 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 from streamlit_drawable_canvas import st_canvas
 
+# Custom CSS to hide the install button
+st.markdown("""
+<style>
+    /* Hide the install button */
+    .css-1u8ud8x {
+        display: none;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Load the model
 @st.cache_resource
 def load_keras_model():
