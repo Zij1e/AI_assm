@@ -8,9 +8,9 @@ from streamlit_drawable_canvas import st_canvas
 # Custom CSS to hide the install button
 st.markdown("""
 <style>
-    /* Hide the install button */
-    .css-1u8ud8x {
-        display: none;
+    /* Hide the download button */
+    .ͼ1.ͼ3.ͼ4.ͼr button[title="Download"] {
+        display: none !important;
     }
 </style>
 """, unsafe_allow_html=True)
