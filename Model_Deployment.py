@@ -5,27 +5,18 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 from streamlit_drawable_canvas import st_canvas
 
-# Custom CSS to hide Streamlit's default elements
-st.markdown("""
-<style>
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    .stDeployButton {display:none;}
-    .viewerBadge_container__r5tak {display: none;}
-    button[title="View fullscreen"] {visibility: hidden;}
-</style>
-""", unsafe_allow_html=True)
-
-# Rest of your original code remains unchanged
+# Initialize session state
 if 'canvas_key' not in st.session_state:
     st.session_state.canvas_key = 0
 
+# Load the model
 @st.cache_resource
 def load_keras_model():
     return load_model('handwriting_recognition_model.h5')
 
 model = load_keras_model()
 
+# Load class mapping
 @st.cache_data
 def load_class_mapping():
     mapp = pd.read_csv(
@@ -40,22 +31,28 @@ def load_class_mapping():
 class_mapping = load_class_mapping()
 
 def predict_character(image):
+    # Preprocess the image
     image = image.resize((28, 28)).convert('L')
     image = np.array(image)
     image = image.reshape(1, 28, 28, 1)
     image = image / 255.0
     
+    # Make prediction
     prediction = model.predict(image)
     class_index = np.argmax(prediction)
     
+    # Get the predicted character
     predicted_char = class_mapping[class_index]
     
+    # Calculate confidence
     confidence = np.max(prediction) * 100
     
     return predicted_char, confidence
 
+# Streamlit UI
 st.title("Handwriting Recognition with LSTM")
 
+# Create a canvas for drawing
 canvas_result = st_canvas(
     fill_color="black",
     stroke_width=20,
@@ -76,6 +73,7 @@ if st.button("Predict"):
     else:
         st.write("Please draw something before predicting.")
 
+# Instructions for users
 st.markdown("""
     ### Instructions:
     1. Draw a single character on the canvas above.
