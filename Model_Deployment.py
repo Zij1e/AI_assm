@@ -5,10 +5,6 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 from streamlit_drawable_canvas import st_canvas
 
-# Initialize session state
-if 'canvas_key' not in st.session_state:
-    st.session_state.canvas_key = 0
-
 # Load the model
 @st.cache_resource
 def load_keras_model():
@@ -61,30 +57,21 @@ canvas_result = st_canvas(
     height=280,
     width=280,
     drawing_mode="freedraw",
-    key=f"canvas_{st.session_state.canvas_key}",
+    key="canvas",
 )
 
-col1, col2 = st.columns(2)
-
-with col1:
-    if st.button("Predict"):
-        if canvas_result.image_data is not None:
-            image = Image.fromarray(canvas_result.image_data.astype('uint8'))
-            predicted_char, confidence = predict_character(image)
-            st.write(f"The predicted character is: {predicted_char}")
-            st.write(f"Confidence: {confidence:.2f}%")
-        else:
-            st.write("Please draw something before predicting.")
-
-with col2:
-    if st.button("Clear Canvas"):
-        st.session_state.canvas_key += 1
-        st.experimental_rerun()
+if st.button("Predict"):
+    if canvas_result.image_data is not None:
+        image = Image.fromarray(canvas_result.image_data.astype('uint8'))
+        predicted_char, confidence = predict_character(image)
+        st.write(f"The predicted character is: {predicted_char}")
+        st.write(f"Confidence: {confidence:.2f}%")
+    else:
+        st.write("Please draw something before predicting.")
 
 # Instructions for users
 st.markdown("""
     ### Instructions:
     1. Draw a single character on the canvas above.
     2. Click 'Predict' to see the recognition result.
-    3. Use 'Clear Canvas' to start over.
 """)
