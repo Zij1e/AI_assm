@@ -5,6 +5,28 @@ from PIL import Image
 from tensorflow.keras.models import load_model
 from streamlit_drawable_canvas import st_canvas
 
+# Set page config
+st.set_page_config(page_title="Handwriting Recognition", page_icon="✍️", layout="wide")
+
+# Custom CSS
+st.markdown("""
+<style>
+    .stApp {
+        background-color: #f0f2f6;
+    }
+    .big-font {
+        font-size:30px !important;
+        font-weight: bold;
+    }
+    .result-box {
+        background-color: #ffffff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+</style>
+""", unsafe_allow_html=True)
+
 # Initialize session state
 if 'canvas_key' not in st.session_state:
     st.session_state.canvas_key = 0
@@ -49,35 +71,48 @@ def predict_character(image):
     
     return predicted_char, confidence
 
-# Streamlit UI
-st.title("Handwriting Recognition with LSTM")
-
-# Create a canvas for drawing
-canvas_result = st_canvas(
-    fill_color="black",
-    stroke_width=20,
-    stroke_color="white",
-    background_color="black",
-    height=280,
-    width=280,
-    drawing_mode="freedraw",
-    key=f"canvas_{st.session_state.canvas_key}",
-)
-
-
-if st.button("Predict"):
-    if canvas_result.image_data is not None:
-        image = Image.fromarray(canvas_result.image_data.astype('uint8'))
-        predicted_char, confidence = predict_character(image)
-        st.write(f"The predicted character is: {predicted_char}")
-        st.write(f"Confidence: {confidence:.2f}%")
-    else:
-        st.write("Please draw something before predicting.")
-
-# Instructions for users
-st.markdown("""
-    ### Instructions:
-    1. Draw a single character on the canvas above.
-    2. Click 'Predict' to see the recognition result.
-    3. Use 'Clear Canvas' to start over.
+# Sidebar
+st.sidebar.title("Instructions")
+st.sidebar.markdown("""
+1. Draw a single character on the canvas.
+2. Click 'Predict' to see the recognition result.
+3. Use 'Clear Canvas' to start over.
 """)
+
+# Main content
+st.title("✍️ Handwriting Recognition with LSTM")
+
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    # Create a canvas for drawing
+    canvas_result = st_canvas(
+        fill_color="black",
+        stroke_width=20,
+        stroke_color="white",
+        background_color="#f0f0f0",
+        height=280,
+        width=280,
+        drawing_mode="freedraw",
+        key=f"canvas_{st.session_state.canvas_key}",
+    )
+
+with col2:
+    st.markdown("<br>" * 4, unsafe_allow_html=True)  # Add some vertical space
+    if st.button("Predict", key="predict_button"):
+        if canvas_result.image_data is not None:
+            image = Image.fromarray(canvas_result.image_data.astype('uint8'))
+            predicted_char, confidence = predict_character(image)
+            
+            st.markdown("<div class='result-box'>", unsafe_allow_html=True)
+            st.markdown("<p class='big-font'>Prediction Result:</p>", unsafe_allow_html=True)
+            st.markdown(f"<h1 style='text-align: center; font-size: 72px;'>{predicted_char}</h1>", unsafe_allow_html=True)
+            st.progress(confidence / 100)
+            st.write(f"Confidence: {confidence:.2f}%")
+            st.markdown("</div>", unsafe_allow_html=True)
+        else:
+            st.warning("Please draw something before predicting.")
+    
+    if st.button("Clear Canvas"):
+        st.session_state.canvas_key += 1
+        st.experimental_rerun()
